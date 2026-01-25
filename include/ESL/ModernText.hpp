@@ -18,7 +18,7 @@ namespace esl {
         };
         Shader* shader = nullptr;
         T text;
-        std::map<GLchar, Character> charMap;
+        std::map<typename T::value_type, Character> charMap;
         Font* font = nullptr;
         glm::vec4 color{ 0,0,0,1 };
         glm::vec2 pos{ 0,0 };

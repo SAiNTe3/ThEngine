@@ -15,9 +15,20 @@ namespace esl
 			int h;
 			Size(int x, int y) :w(x), h(y) {};
 		};
+		
 	public:
-		Texture(const char* path);
-		Texture(const std::string& path);
+		enum class Filter {
+			LINEAR, //线性过滤
+			NEAREST, //最近邻过滤
+		};
+		enum class Wrap {
+			REPEAT,	//纹理坐标超出[0,1]范围时，重复纹理
+			MIRRORED_REPEAT, //纹理坐标超出[0,1]范围时，镜像重复纹理
+			CLAMP_TO_EDGE, //当纹理坐标超出[0,1]范围时，会使用纹理边缘的颜色
+			CLAMP_TO_BORDER //纹理坐标超出部分取边界颜色
+		};
+		Texture(const char* path, Wrap wrap = Wrap::REPEAT, Filter filter = Filter::LINEAR);
+		Texture(const std::string& path, Wrap wrap = Wrap::REPEAT, Filter filter = Filter::LINEAR);
 		Texture(uint glfwTextureID, uint width, uint height);
 		~Texture();
 		Size getSize();

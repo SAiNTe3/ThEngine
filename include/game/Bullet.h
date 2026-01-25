@@ -57,7 +57,7 @@ public:
 // ========== Bullet_1 й╣ож ==========
 class Bullet_1 : public Bullet {
 	static pTexture sTexture[6];
-	esl::Window& mRender;
+	esl::Window& mRenderer;
 	void updateMovementActions(double deltaTime);
 
 public:

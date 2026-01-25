@@ -163,7 +163,7 @@ void Bullet_1::init() {
 	}
 }
 
-Bullet_1::Bullet_1(int type, int color, glm::vec2 pos, esl::Window& render, float angle, float speed):mRender(render), mAngle(angle), mSpeed(speed)
+Bullet_1::Bullet_1(int type, int color, glm::vec2 pos, esl::Window& render, float angle, float speed):mRenderer(render), mAngle(angle), mSpeed(speed)
 {
 	static bool firstTime = true;
 	if (firstTime) {
@@ -243,7 +243,7 @@ void Bullet_1::update(double delta)
 
 void Bullet_1::render()
 {
-	mRender.draw(*mSprite);
+	mRenderer.draw(*mSprite);
 }
 
 void Bullet_1::updateMovementActions(double deltaTime)

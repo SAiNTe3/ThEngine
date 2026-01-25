@@ -61,9 +61,9 @@ void Stage01_Background::update(double deltaTime)
 	case 0: {
 		static float last_frame_pos_y = 0;
 		last_frame_pos_y = mCamera.m_Pos.y;
-		float distance = 20 * deltaTime;
-		mCamera.m_Pos.y += 20 * deltaTime;
-		mCamera.m_Target.y += 20 * deltaTime;
+		float distance = static_cast<float>(20 * deltaTime);
+		mCamera.m_Pos.y += static_cast<float>(20 * deltaTime);
+		mCamera.m_Target.y += static_cast<float>(20 * deltaTime);
 		mCloudSprite->setPosition({ 0, -mCamera.m_Pos.y,0 });
 		if (mCamera.m_Pos.y >= 512) {
 			mCamera.m_Pos.y = last_frame_pos_y + distance - 512;

@@ -3,6 +3,8 @@
 #include <Sprite.hpp>
 #include <CharacterMap.hpp>
 #include <Text.hpp>
+
+
 class Boss;
 class Front {
 	const float LEFT = 64.0f;

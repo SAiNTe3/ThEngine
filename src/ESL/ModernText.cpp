@@ -64,9 +64,9 @@ namespace esl {
                     texture,
                     glm::ivec2(font->face->glyph->bitmap.width, font->face->glyph->bitmap.rows),
                     glm::ivec2(font->face->glyph->bitmap_left, font->face->glyph->bitmap_top),
-                    font->face->glyph->advance.x
+                    (GLuint)font->face->glyph->advance.x
                 };
-                charMap.insert(std::pair<GLchar, Character>(text[i], character));
+                charMap.insert(std::pair<typename T::value_type, Character>(text[i], character));
             }
         }
     }

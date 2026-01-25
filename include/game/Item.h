@@ -3,7 +3,7 @@
 #include <deque>
 #include <Sprite.hpp>
 #include <Window.hpp>
-
+#include <functional>
 using pTexture = std::unique_ptr<esl::Texture>;
 using pSprite = std::unique_ptr<esl::Sprite>;
 
@@ -26,8 +26,10 @@ protected:
 	bool checkAvailable();
 	void render();
 	bool isCollected = false;
-	
+	bool mMoveToCenter = false;
 	static float collectLineY;
+	static glm::vec2 centerPos;
+	glm::vec2 mTargetPos = {0,0};
 public:
 	enum class Type {
 		PowerUp,
@@ -42,7 +44,8 @@ public:
 	~Item();
 	static void init(esl::Window* renderer, Player* player, struct Data& data);
 	static void generate_item(Type type, glm::vec2 pos);
-	static void generate_items(int num1, int num2, int num3, int num4, int num5, int num6, int num7, glm::vec2 pos, int radius);
+	static void generate_at_player_death(glm::vec2 pos, glm::vec2 centerPos);
+	static void generate_items(int PowerUp, int Power, int LifeUp, int Life, int SpellCard, int FullPower, int Point, glm::vec2 pos, int radius);
 	static void RenderAll();
 	static void UpdateAll(double delta, float playerPosY);
 	static void SetCollectLine(float y);

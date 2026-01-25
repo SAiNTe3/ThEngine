@@ -9,7 +9,7 @@ namespace esl
 	class Sprite : public Renderable
 	{
 	private:
-
+		
 	protected:
 		float m_Rotation = 0;
 		glm::vec2 m_Origin = glm::vec2(0.f, 0.f);
@@ -47,9 +47,11 @@ namespace esl
 		void setAlpha(float alpha) { m_Color.a = alpha; }
 		void setOrigin(glm::vec2 pos);
 		void setTextureRect(glm::vec2 pos, glm::vec2 size);
+		void setTextureRectFlip(glm::vec2 pos, glm::vec2 size);
 		void setRepeat(glm::uvec2 size);
 		void setBorderVisiable(bool visible);
 		void setAvailable(bool available);
+		
 		Texture* getTexture() const;
 		glm::vec2 getPosition() const;
 		float getRotation() const;

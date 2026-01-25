@@ -114,7 +114,7 @@ namespace esl
 			static_cast<float>(rgba_int.a) / 255.f
 		};
 	}
-	void Window::setWindowSize(glm::vec2 size)
+	void Window::setWindowSize(glm::ivec2 size)
 	{
 		glfwSetWindowSize(this->m_Window, size.x, size.y);
 	}
@@ -124,7 +124,7 @@ namespace esl
 		glfwGetWindowSize(this->m_Window, &size.x, &size.y);
 		return size;
 	}
-	void Window::setWindowPosition(glm::vec2 pos)
+	void Window::setWindowPosition(glm::ivec2 pos)
 	{
 		glfwSetWindowPos(this->m_Window, pos.x, pos.y);
 	}

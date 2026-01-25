@@ -5,9 +5,8 @@
 #include <algorithm>
 #include <random>
 #include <ScriptSystem.h>
-#ifndef PRINT_INFO
-#define PRINT_INFO printf
-#endif
+#include <Animation.h>
+
 
 using pSprite = std::unique_ptr<esl::Sprite>;
 using pTexture = std::unique_ptr<esl::Texture>;
@@ -31,6 +30,7 @@ struct TraceBullet {
 		velocity = {0, 1}; // 向上方向（正Y方向）
 	}
 };
+
 
 class Player {
 
@@ -57,7 +57,9 @@ protected:
 	std::vector<Enemy*>* mEnemyList = nullptr;
 	// 无敌状态
 	bool mInvincible = false;
-	double mInvincibleTimer = 1.0;
+	double mInvincibleTimer = 5.0;
+
+	DeathCircle mDeathCircle;
 public:
 	std::vector<pSprite> mBullets;
 	unsigned int& mPower;

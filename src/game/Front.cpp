@@ -39,7 +39,7 @@ void Front::hideBossXPosIndicator()
 Front::Front(esl::Window& window) : renderer(window)
 {
 	const std::string texture_path = "Assets/front/front00.png";
-	mTexture = std::make_unique<esl::Texture>(texture_path);
+	mTexture = std::make_unique<esl::Texture>(texture_path, esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	mLeftSprite = std::make_unique<esl::Sprite>(mTexture.get());
 	mRightSprite = std::make_unique<esl::Sprite>(mTexture.get());
 	mTopSprite = std::make_unique<esl::Sprite>(mTexture.get());
@@ -98,7 +98,7 @@ Front::Front(esl::Window& window) : renderer(window)
 
 	mDifficultyIcons = std::make_unique<esl::Sprite>(mTexture.get());
 	mItemGetBorderLine = std::make_unique<esl::Sprite>(mTexture.get());
-	mItemGetBorderLine->setTextureRect({ 512.5,416 }, { 334,48 });
+	mItemGetBorderLine->setTextureRect({ 512,416 }, { 334,48 });
 	mItemGetBorderLine->setScale({ 2,1 });
 	mItemGetBorderText = std::make_unique<esl::Sprite>(mTexture.get());
 	mItemGetBorderText->setTextureRect({ 512,448 }, { 334,64 });
@@ -118,7 +118,10 @@ void Front::bindData(unsigned int& score, unsigned int& highscore, unsigned int&
 }
 Front::~Front()
 {
-	delete[] mHighScoreText, mScoreText, mPowerText, mMoneyText;
+	delete[] mHighScoreText;
+	delete[] mScoreText;
+	delete[] mPowerText;
+	delete[] mMoneyText;
 }
 void Front::char_map_init()
 {
@@ -276,14 +279,15 @@ void Front::text_update()
 	for (int i = 0; i < 2; i++) {
 		std::string str = std::to_string(*mData.score);
 		if (str.size() > 3) {
-			for (int j = str.size() - 3; j > 0; j -= 3) {
+			for (int j = static_cast<int>(str.size()) - 3; j > 0; j -= 3) {
 				str.insert(j, ",");
 			}
 		}
 		mScoreText[i]->setText(str);
 		str = std::to_string(*mData.highscore);
 		if (str.size() > 3) {
-			for (int j = str.size() - 3; j > 0; j -= 3) {
+
+			for (int j = static_cast<int>(str.size()) - 3; j > 0; j -= 3) {
 				str.insert(j, ",");
 			}
 		}
@@ -333,13 +337,13 @@ void Front::render()
 void Front::update(double delta)
 {
 	glm::vec2 pos = { 320 + 512,1024 - 36 };
-	for (int i = 0; i < *mData.life; i++) {
+	for (unsigned int i = 0; i < *mData.life; i++) {
 		mLifes[i]->setTextureRect(pos + glm::vec2{ mRect.x * 3,0 }, mRect);
 	}
 	for (int i = *mData.life; i < 7; i++){
 		mLifes[i]->setTextureRect(pos + glm::vec2{ 0,0 }, mRect);
 	}
-	for (int i = 0; i < *mData.spellcard; i++) {
+	for (unsigned int i = 0; i < *mData.spellcard; i++) {
 		mSpellCards[i]->setTextureRect(pos + glm::vec2{ mRect.x * 3,-39 }, mRect);
 	}
 	for (int i = *mData.spellcard; i < 7; i++) {
@@ -349,8 +353,8 @@ void Front::update(double delta)
 	// 收取线显示动画
 	if (mItemGetAnimationStarted) {
 		mItemGetAnimationTime += delta;
-		mItemGetBorderLine->setAlpha(sin((mItemGetAnimationTime - 0.125) * 4 * glm::pi<double>())/2+0.5);
-		mItemGetBorderText->setAlpha(sin((mItemGetAnimationTime - 0.125) * 4 * glm::pi<double>()) / 2 + 0.5);
+		mItemGetBorderLine->setAlpha(static_cast<float>(sin((mItemGetAnimationTime - 0.125) * 4 * glm::pi<double>())/2+0.5));
+		mItemGetBorderText->setAlpha(static_cast<float>(sin((mItemGetAnimationTime - 0.125) * 4 * glm::pi<double>()) / 2 + 0.5));
 		if (mItemGetAnimationTime > 4) {
 			mItemGetAnimationStarted = false;
 			mItemGetBorderLine->setAlpha(0);
@@ -364,7 +368,7 @@ void Front::update(double delta)
 		mBossXPosIndicatorAnimationTime += delta;
 		
 		if (mBossXPosIndicatorAnimationTime >= 0.05 && mBossXPosIndicatorAlphaReverseTime <10) {
-			mBossXPosIndicator->setAlpha(mBossXPosIndicatorAlphaReverseTime %2 ? 0.0 : 1.f);
+			mBossXPosIndicator->setAlpha(static_cast<float>(mBossXPosIndicatorAlphaReverseTime %2 ? 0.0 : 1.f));
 			mBossXPosIndicatorAlphaReverseTime++;
 			mBossXPosIndicatorAnimationTime = 0.f;
 		}

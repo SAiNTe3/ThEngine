@@ -1,3 +1,5 @@
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <ScriptSystem.h>
 #include <fstream>
 #include <string>
@@ -201,7 +203,7 @@ void ScriptSystem::update(double deltaTime)
 			alpha = 1;
 		}
 		else if (mAudioTimer >= 2 && mAudioTimer < 3) {
-			alpha = - mAudioTimer + 3.0f;
+			alpha = static_cast<float>( - mAudioTimer + 3.0f);
 		}
 		else {
 			alpha = 0.0f;
@@ -228,7 +230,7 @@ void ScriptSystem::update(double deltaTime)
 			mStageClearTimer = 0.0;
 		}
 		float scaley = mStageClearSprite->getScale().y;
-		scaley +=4*(mStageClearAnimationRev ? -deltaTime : deltaTime);
+		scaley +=4*static_cast<float>(mStageClearAnimationRev ? -deltaTime : deltaTime);
 		if (scaley > 1) scaley = 1;
 		mStageClearSprite->setScale({ 1,scaley });
 		

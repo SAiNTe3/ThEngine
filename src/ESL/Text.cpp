@@ -1,3 +1,5 @@
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include "Text.hpp"
 #include <locale>
 #include <codecvt>
@@ -6,6 +8,8 @@
 #include <fstream>  // 添加文件流支持
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
+
 namespace esl
 {
 

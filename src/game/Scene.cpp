@@ -14,10 +14,10 @@ void Scene::update(double deltaTime)
 {
 }
 
-TitleScene::TitleScene(esl::Window& render, ScriptSystem& system) :Scene(system), mRender(render)
+TitleScene::TitleScene(esl::Window& renderer, ScriptSystem& system) :Scene(system), mRenderer(renderer)
 {
 
-	glm::ivec2 renderPos = render.getWindowSize();
+	glm::ivec2 renderPos = renderer.getWindowSize();
 	mTitleBackTexture = std::make_unique<esl::Texture>(".\\Assets\\title\\title_bk01.png");
 	mTitleBackgroundSprite = std::make_unique<esl::Sprite>(mTitleBackTexture.get());
 	mTitleBackgroundSprite->setPosition(renderPos / 2);
@@ -71,12 +71,12 @@ void TitleScene::process_input(esl::Event& e)
 
 void TitleScene::render()
 {
-	mRender.clear();
-	mRender.draw(*mTitleBackgroundSprite.get());
+	mRenderer.clear();
+	mRenderer.draw(*mTitleBackgroundSprite.get());
 	for (auto& element : mMenuSelections) {
-		mRender.draw(*element.get());
+		mRenderer.draw(*element.get());
 	}
-	mRender.display();
+	mRenderer.display();
 }
 
 void TitleScene::update(double deltaTime)
@@ -88,14 +88,15 @@ void TitleScene::update(double deltaTime)
 	mMenuSelections[mSelectIndex]->setColor(glm::vec4{ 1,1,1,1 });
 }
 
-MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mRender(render)
+MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mRenderer(render)
 {
-	mFront = new Front(mRender);
+	
+	mFront = new Front(mRenderer);
 	// 步骤1：初始化静态资源（不依赖实例的）
-	Background3D::init(&mRender, mCenterPos);
-	Enemy::init(&mRender);
+	Background3D::init(&mRenderer, mCenterPos);
+	Enemy::init(&mRenderer);
 	Enemy::setSystem(&mScriptSystem);
-	Bullet_1::init();  // ← 在预分配之前
+	Bullet_1::init();  // 在预分配之前
 	Bullet::initEtBreak();
 	Player::setSystem(&mScriptSystem);
 
@@ -104,12 +105,12 @@ MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mR
 	mAllEnemyBullets.reserve(2500);
 
 	// 步骤3：创建 Player 实例
-	mPlayer = new Reimu(mRender, mData.mPlayerPower);
+	mPlayer = new Reimu(mRenderer, mData.mPlayerPower);
 	mPlayer->set_position(Position());
 	mPlayer->setEnemyList(&mEnemys);
 
 	// 步骤4：初始化依赖 Player 的系统（现在 mPlayer 已经存在）
-	Item::init(&mRender, mPlayer, mData);
+	Item::init(&mRenderer, mPlayer, mData);
 
 	// 步骤5：其他初始化
 	mScriptSystem.setCenterPos(mCenterPos);
@@ -121,17 +122,21 @@ MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mR
 	mFront->setDifficultyMode(4, Position({608,768}));
 	mFront->setItemGetBorderLine(Position({ 0,543 }));
 	Item::SetCollectLine(Position().y + 543);
+
+	mBlurEffect.resize(glm::vec2(768, 896));
+	
 	// 设置碰撞管理器的回调函数
 	mCollisionManager.setEnemyBulletHitPlayerCallback([this]() {
+		if (mPlayer->isInvincible()) return;
 		if (mData.mPlayerLife > 0) {
 			mData.mPlayerLife--;
+			Item::generate_at_player_death(mPlayer->get_position(), Position({0,450}));
 			mPlayer->hitPlayer(Position({0,-128}));
-			mPlayer->mPower -= 100;
-			if (mPlayer->mPower < 100) mPlayer->mPower = 100;
 			// 清除当前屏幕所有敌人子弹
 			for (auto& enemy : mEnemys) {
 				enemy->clearBullets();
 			}
+			
 		}
 	});
 	// 擦弹回调
@@ -147,12 +152,14 @@ MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mR
 		
 	});
 	setupStage();
+
+	
 }
 
 void MainGame::process_input(esl::Event& e)
 {
 	static bool key_pressed_last_frame = false; 
-	static bool input_suppression = true;  // 添加输入抑制标志
+	static bool input_suppression = true;  // 输入抑制标志
 	
 	// 检查是否需要解除输入抑制：当Z键完全释放时
 	if (input_suppression && e.isKeyReleased(Keyboard::KEY_Z)) {
@@ -161,15 +168,20 @@ void MainGame::process_input(esl::Event& e)
 
 	if (e.isKeyPressed(Keyboard::KEY_ESCAPE) && !key_pressed_last_frame) {
 		key_pressed_last_frame = true;
-		mPause = !mPause;
-		if (mPause) {
+		// 若当前未暂停
+		if (!mPause) {
+			mPause = true;
 			pause();
 			mScriptSystem.pauseAudio();
 			mScriptSystem.playSoundEffect("se_pause.wav");
+			mBlurredScreenReady = false;
+			mPauseMenu.start(Position());
 		}
 		else {
-			resume();
-			mScriptSystem.resumeAudio();
+			if (mPauseMenu.state != PauseMenu::PauseMenuState::FADE_OUT) {
+				mPauseMenu.state = PauseMenu::PauseMenuState::FADE_OUT;
+				mPauseMenu.restartTimer();
+			}
 		}
 	}
 	else if(e.isKeyReleased(Keyboard::KEY_ESCAPE)){
@@ -181,10 +193,10 @@ void MainGame::process_input(esl::Event& e)
 		// 方向处理
 		glm::vec2 pos = mPlayer->get_position();
 	
-		mPlayer->mDirection.v = e.isKeyPressed(Keyboard::KEY_UP)&&(pos.y<960+32) ? 1 :
-			(e.isKeyPressed(Keyboard::KEY_DOWN)&&(pos.y>32) ? -1 : 0);
-		mPlayer->mDirection.h = e.isKeyPressed(Keyboard::KEY_LEFT)&&(pos.x>64) ? -1 :
-			(e.isKeyPressed(Keyboard::KEY_RIGHT)&&(pos.x<64+768) ? 1 : 0);
+		mPlayer->mDirection.v = static_cast<float>(e.isKeyPressed(Keyboard::KEY_UP) && (pos.y < 960 + 32) ? 1 :
+			(e.isKeyPressed(Keyboard::KEY_DOWN) && (pos.y > 32) ? -1 : 0));
+		mPlayer->mDirection.h = static_cast<float>(e.isKeyPressed(Keyboard::KEY_LEFT)&&(pos.x>64) ? -1 :
+			(e.isKeyPressed(Keyboard::KEY_RIGHT)&&(pos.x<64+768) ? 1 : 0));
 		// Shift键效果
 		if (shiftPressed) {
 			mPlayer->mDirection.h /= 2;
@@ -208,22 +220,35 @@ void MainGame::process_input(esl::Event& e)
 }
 void MainGame::render()
 {
-	if (mPause) return;	
-
-	mRender.clear();
+	
+	mRenderer.clear();
 	mBackground->render();
 	for (auto& enemy : mEnemys) {
 		enemy->render();
 	}
-	Bullet::drawEtBreaks(mRender);
+	Bullet::drawEtBreaks(mRenderer);
 	mPlayer->render();
 	Item::RenderAll();
+	
+	mDeathCircle.draw(mRenderer);
 
 	mScriptSystem.render();
 	mFront->render();
-	//mPlayer->slowEffectRender();
+	mPlayer->slowEffectRender();
+	if (mPause) {
+		if (!mBlurredScreenReady) {
+			mBlurEffect.captureScreen(mRenderer, { 64, 32 }, { 768, 896 });
+			mBlurEffect.setIterations(2);
+			mBlurEffect.setSpread(0.5f);
+			mBlurEffect.process();
+			mBlurredScreenReady = true;
+		}
+		
+		mRenderer.draw(mBlurEffect);
+		mPauseMenu.draw(mRenderer);
+	}
 	
-	mRender.display();
+	mRenderer.display();
 
 }
 
@@ -278,6 +303,14 @@ void MainGame::setupStage() {
 			.build(),
 			Enemy::ActionType::SPAWN
 		);
+		boss->addAction(
+			LinearMovement()
+			.to(Position({ 200,700 }))
+			.speed(100)
+			.easeOut()
+			.build(),
+			Enemy::ActionType::DEATH
+		);
 		game->mEnemys.push_back(boss);
 		boss->addAwait(DBL_MAX);
 		mScriptSystem.activateDialogueSection("opening");
@@ -303,16 +336,25 @@ void MainGame::setupStage() {
 			mScriptSystem.nextAudio();
 		}
 	);
+
+
 	mStage.start(this);
 	
 }
 void MainGame::update(double deltaTime)
 {
-	if (mPause) return;
-
 	mDeltaTime += deltaTime;
+	if (mPause) {
+		if (mPauseMenu.state == PauseMenu::PauseMenuState::FINISHED) {
+			resume();
+			mScriptSystem.resumeAudio();
+			mPause = false;
+		}
+		mPauseMenu.update(deltaTime);
+		return;
+	}
+	
 	mBackground->update(deltaTime);
-	//printf("%d\n", mAllEnemyBullets.size());
 	
 	mAllEnemyBullets.clear();
 	
@@ -355,6 +397,8 @@ void MainGame::update(double deltaTime)
 		mCollisionManager.checkPlayerVsEnemy(*mPlayer, *enemy);
 	}
 
+	// DeathCircle 更新
+	mDeathCircle.update(deltaTime);
 	// 批量清理死亡敌人
 	mEnemys.erase(
 		std::remove_if(mEnemys.begin(), mEnemys.end(), [this](Enemy* enemy) {
@@ -362,6 +406,9 @@ void MainGame::update(double deltaTime)
 				// 如果是 Boss,先通知 Front
 				if (auto* boss = dynamic_cast<Boss*>(enemy)) {
 					mFront->hideBossXPosIndicator();
+					// 在此处调用deathcircle
+					mDeathCircle.start(boss->getPosition());
+					mScriptSystem.playSoundEffect("se_enep01.wav");
 				}
 				delete enemy;
 				return true;

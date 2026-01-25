@@ -16,7 +16,7 @@ glm::vec2 Player::get_position()
 void Player::move(glm::vec2 distance)
 {
 	// 无敌状态下不可移动，自动复原位置
-	if (mInvincible) return;
+	if (mInvincible && mInvincibleTimer > 4.0) return;
 	mSprite->move(distance);
 }
 
@@ -39,9 +39,13 @@ void Player::slowEffectRender()
 
 void Player::hitPlayer(glm::vec2 rebirthPos)
 {
+
 	mInvincible = true;
-	mInvincibleTimer = 1.0;
+	mInvincibleTimer = 5.0;
+	mDeathCircle.start(mSprite->getPosition());
 	set_position(rebirthPos);
+	mPower -= 100;
+	if (mPower < 100) mPower = 100;
 }
 
 void Reimu::update_bullets(double delta)
@@ -190,8 +194,8 @@ bool Reimu::isTargetValid(Enemy* target)
 
 Reimu::Reimu(esl::Window& renderer, unsigned int& power) :mRenderer(renderer), Player(power)
 {
-	mTexture = std::make_unique<esl::Texture>(".\\Assets\\player\\reimu.png");
-	mSlowEffectTexture = std::make_unique<esl::Texture>(".\\Assets\\effect\\eff_sloweffect.png");
+	mTexture = std::make_unique<esl::Texture>(".\\Assets\\player\\reimu.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
+	mSlowEffectTexture = std::make_unique<esl::Texture>(".\\Assets\\effect\\eff_sloweffect.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	for (int i = 0; i < 8; i++) {
 		mRect[i]={ i*32,48*2 };
 	}
@@ -206,7 +210,7 @@ Reimu::Reimu(esl::Window& renderer, unsigned int& power) :mRenderer(renderer), P
 	std::string bullet_dir_path = "Assets\\bullet\\reimu\\";
 	for (int i = 0; i < 11; i++) {
 		std::string path = bullet_dir_path + std::to_string(i + 1);
-		this->mBulletTextures.push_back(std::make_unique<esl::Texture>(path + ".png"));
+		this->mBulletTextures.push_back(std::make_unique<esl::Texture>(path + ".png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST));
 	}
 	mSlowEffectSprite = std::make_unique<esl::Sprite>(mSlowEffectTexture.get());
 	mSlowEffectSprite->setTextureRect({ 0,0 }, { 64,64 });
@@ -214,14 +218,14 @@ Reimu::Reimu(esl::Window& renderer, unsigned int& power) :mRenderer(renderer), P
 	mMissRadius = 3*2;
 	mSlowEffectSprite->setPosition(mSprite->getPosition());
 
-	mYinYangOrbTexture = std::make_unique<esl::Texture>(".\\Assets\\bullet\\reimu\\9.png");
+	mYinYangOrbTexture = std::make_unique<esl::Texture>(".\\Assets\\bullet\\reimu\\9.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	mYinYangOrbs.resize(1);
 	mYinYangOrbs[0] = std::make_unique<esl::Sprite>(mYinYangOrbTexture.get());
 	mYinYangOrbs[0]->setScale({1.5,1.5});
 	mYinYangOrbs[0]->setPosition(mSprite->getPosition()+glm::vec2{0,-72});
 	
 	// 追踪弹纹理加载
-	mTraceBulletTexture = std::make_unique<esl::Texture>(".\\Assets\\bullet\\reimu\\trace.png");
+	mTraceBulletTexture = std::make_unique<esl::Texture>(".\\Assets\\bullet\\reimu\\trace.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 }
 
 void Reimu::update(double delta)
@@ -234,7 +238,16 @@ void Reimu::update(double delta)
 			mInvincible = false;
 			mInvincibleTimer = 0.0;
 		}
-		mSprite->move({ 0, delta * 128 });
+		else if (mInvincibleTimer > 4.0) {
+			mSprite->move({ 0, delta * 128 });
+		}
+
+		if (static_cast<int>(std::ceil(mInvincibleTimer * 20)) % 2) {
+			mSprite->setAlpha(0.f);
+		}
+		else {
+			mSprite->setAlpha(1.f);
+		}
 	}
 	if (mDirection.h < 0) {
 		mSpriteIndex = 8;
@@ -283,6 +296,8 @@ void Reimu::update(double delta)
 
 	// 更新阴阳玉计数
 	mYinYangOrbCount = requiredOrbs;
+
+	mDeathCircle.update(delta);
 }
 
 void Reimu::shoot()
@@ -354,6 +369,7 @@ void Reimu::render()
 	for(int i=0;i<mPower/100 && i<mYinYangOrbs.size();i++){
 		mRenderer.draw(*mYinYangOrbs[i].get());
 	}
+	mDeathCircle.draw(mRenderer);
 }
 
 void Reimu::slowEffectRender()

@@ -67,12 +67,12 @@ namespace esl
 
 		if (m_isShapeFilled) {
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, m_vertices.size());
+			glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<GLsizei>(m_vertices.size()));
 		}
 		else {
 			glBindVertexArray(m_borderVAO);
 			glLineWidth(m_borderWidth);
-			glDrawArrays(GL_LINE_LOOP, 0, m_pointCount);
+			glDrawArrays(GL_LINE_LOOP, 0, static_cast<GLsizei>(m_pointCount));
 		}
 
 		glBindVertexArray(0);

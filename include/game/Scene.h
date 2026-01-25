@@ -10,9 +10,8 @@
 #include <Background3D.h>
 #include <ScriptSystem.h>
 #include <Stage.h>
-#ifndef PRINT_INFO
-#define PRINT_INFO printf
-#endif
+#include <Animation.h>
+#include <BlurEffect.hpp>
 
 using pSprite = std::unique_ptr<esl::Sprite>;
 using pTexture = std::unique_ptr<esl::Texture>;
@@ -35,7 +34,7 @@ public:
 
 // 游戏主界面
 class TitleScene :public Scene {
-	esl::Window& mRender;
+	esl::Window& mRenderer;
 	// 背景图片
 	pTexture mTitleBackTexture;
 	pSprite mTitleBackgroundSprite;
@@ -63,18 +62,24 @@ class MainGame :public Scene {
 	const float RIGHT = 64 + 768.0f;
 	const float TOP = 896 + 32;
 	const float BOTTOM = 32.0f;
-	esl::Window& mRender;
+	esl::Window& mRenderer;
 	Player* mPlayer;
 	double mDeltaTime = 0;
 	std::vector<Enemy*> mEnemys;
 	CollisionManager mCollisionManager;  // 添加碰撞管理器
-	Front* mFront;  // 添加前景对象
+	Front* mFront;
 	Stage mStage;
 	Data mData;
 	Background3D* mBackground;
 	glm::vec2 mCenterPos { 768.0f / 2 + 64 ,128 };
 	bool mPause = false;
 	std::vector<Bullet*> mAllEnemyBullets;
+
+	// DeathCircle
+	DeathCircle mDeathCircle;
+	PauseMenu mPauseMenu;
+	esl::BlurEffect mBlurEffect;
+	bool mBlurredScreenReady = false;
 public:
 	MainGame(esl::Window& render, ScriptSystem& system);
 	virtual void process_input(esl::Event& e);

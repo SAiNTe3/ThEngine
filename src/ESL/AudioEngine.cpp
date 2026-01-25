@@ -8,7 +8,7 @@ namespace esl
 	AudioEngine::AudioEngine(ma_uint64 sampleRate)
 	{
 		ma_engine_config engineConfig = ma_engine_config_init();
-		engineConfig.sampleRate = sampleRate;
+		engineConfig.sampleRate = static_cast<ma_uint32>(sampleRate);
 		ma_engine_init(&engineConfig, &m_Engine);
 	}
 	AudioEngine::~AudioEngine()

@@ -165,6 +165,57 @@ namespace esl
 		m_RectScale = { u2 - u1,v2 - v1 };
 	}
 
+	void Sprite::setTextureRectFlip(glm::vec2 pos, glm::vec2 size)
+	{
+		if (!m_Texture) return;
+
+		float textureWidth = static_cast<float>(m_Texture->getWidth());
+		float textureHeight = static_cast<float>(m_Texture->getHeight());
+
+		// U 方向 (水平) 通常不需要变，左边就是 0
+		float u1 = pos.x / textureWidth;
+		float u2 = (pos.x + size.x) / textureWidth;
+
+		// V 方向 (垂直) 转换
+		// 输入的 pos.y 是距离图片顶部的像素数
+		// 我们需要将其转换为距离图片底部的 UV 坐标
+		// OpenGL UV: 0 在底部，1 在顶部。
+
+		// 顶部边界的 UV (对应 pos.y) -> 1.0 - (pos.y / height)
+		// 底部边界的 UV (对应 pos.y + size.y) -> 1.0 - ((pos.y + size.y) / height)
+
+		// 注意：v1 应该是较小的 UV 值还是较大的？这取决于你的顶点顺序和图片是否在加载时翻转了。
+		// 通常图片加载时如果是 stbi_set_flip_vertically_on_load(true)，图片所以在内存里是正的。
+		// 此时 texture(uv) 中 v=0 是图片底部。
+
+		// 想要切取图片“视觉上”的上方区域 (pos.y)
+		// 对应的 UV 应该是靠近 1.0 的区域
+
+		float v2 = 1.0f - (pos.y / textureHeight);           // 矩形顶部的 V (数值较大)
+		float v1 = 1.0f - ((pos.y + size.y) / textureHeight); // 矩形底部的 V (数值较小)
+
+		// 更新顶点数据 (保持顶点顺序与 setTextureRect 一致)
+		// 假设你的顶点顺序是: 左下, 右下, 左上, 右上
+		// 左下对应的 UV 是 (u1, v1)
+		// 右下对应的 UV 是 (u2, v1)
+		// 左上对应的 UV 是 (u1, v2)
+		// 右上对应的 UV 是 (u2, v2)
+
+		float vertices[] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, u1, v1,
+			 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, u2, v1,
+			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 0.0f, u1, v2,
+			 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 0.0f, u2, v2
+		};
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		// 保存缩放比例用于后续计算
+		m_RectScale = { u2 - u1, v2 - v1 }; // 这里可能需
+	}
+
 	void Sprite::setRepeat(glm::uvec2 size)
 	{
 		m_RepeatScale = size;
@@ -261,6 +312,7 @@ namespace esl
 		m_Shader->setMat4("projection", projection);
 		m_Shader->setMat4("view", view);
 		glm::mat4 transform = glm::mat4(1.0f);
+
 		transform = glm::translate(transform, m_Position);
 		transform = glm::translate(transform, glm::vec3(m_Origin, 0.0f));
 

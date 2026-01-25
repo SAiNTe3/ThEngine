@@ -44,7 +44,7 @@ void Message::update(double deltaTime)
 {
 	scaleX = text[0]->getScale().x;
 	if (scaleX < 1.0f) {
-		scaleX += deltaTime * 4;
+		scaleX += static_cast<float>(deltaTime) * 4;
 	}
 	else scaleX = 1.0f;
 	text[0]?text[0]->setScale({ scaleX,text[0]->getScale().y }):void(0);
@@ -94,7 +94,7 @@ void Message::setBalloonStyle(int style)
 	int h[] = { 96,128,96,96,128,148,144,144 };
 	rect = { x,1024 - y[style] - h[style],w,h[style]};
 	int offset[] = { 24,8,18,18,24,12,18,18 };
-	y_offset = offset[style];
+	y_offset = static_cast<float>(offset[style]);
 }
 
 void Message::setFont(esl::Font& font)
@@ -120,7 +120,7 @@ void Message::endEdit()
 	size_t count = len1 > len2 ? len1 : len2;
 
 	float current_x = pos.x;
-	float scale = 0.6;
+	float scale = 0.6f;
 
 	int direction = (role == 1) ? -1 : 1;
 

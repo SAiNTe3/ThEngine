@@ -11,6 +11,8 @@ const float Item::mMaxSpeed = 150.0f;
 Player* Item::mPlayer = nullptr;
 Data* Item::mData = nullptr;
 float Item::collectLineY = 800;
+glm::vec2 Item::centerPos = { 0,0 };
+
 Item::Item(Type type) :mType(type)
 {
 	mSprite = std::make_unique<esl::Sprite>(itemTexture.get());
@@ -52,7 +54,7 @@ void Item::init(esl::Window* renderer, Player* player, Data& data)
 	mPlayer = player;
 	mData = &data;
 	if (!itemTexture) {
-		itemTexture = std::make_unique<esl::Texture>(".\\Assets\\bullet\\item.png");
+		itemTexture = std::make_unique<esl::Texture>(".\\Assets\\bullet\\item.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	}
 }
 
@@ -61,6 +63,21 @@ void Item::generate_item(Type type, glm::vec2 pos)
 	Item* item = new Item(type);
 	item->mSprite->setPosition(pos);
 	mItems.push_back(item);
+}
+
+void Item::generate_at_player_death(glm::vec2 pos, glm::vec2 centerPos)
+{
+	const glm::vec2 offsets[6] = {
+		{-64,24}, {-48,48}, {-12, 64}, {12,64}, {48,48}, {64,24}
+	};
+	Item::centerPos = centerPos;
+	for (int i = 0; i < 6; i++) {
+		Item* item = new Item(Type::Power);
+		item->mSprite->setPosition(pos + offsets[i]);
+		item->mMoveToCenter = true;
+		item->mTargetPos = centerPos + offsets[i]; 
+		mItems.push_back(item);
+	}
 }
 
 void Item::generate_items(int num1, int num2, int num3, int num4, int num5, int num6, int num7, glm::vec2 pos, int radius)
@@ -156,12 +173,23 @@ void Item::update(double delta)
 		isCollected = true;
 	}
 	else {
-		// 如果速度小于最大速度，则加速
-		if (mSpeed < mMaxSpeed)
-			mSpeed += mAcc * static_cast<float>(delta);
-		// 否则匀速移动
-		else mSpeed = mMaxSpeed;
-		mSprite->move({ 0,-mSpeed * static_cast<float>(delta) });
+		if (this->mMoveToCenter) {
+			// 向中心点移动
+			glm::vec2 direction = glm::normalize(mTargetPos - mSprite->getPosition());
+			mSprite->move(direction * 300.f * static_cast<float>(delta));
+			float distanceToTarget = glm::distance(mTargetPos, mSprite->getPosition());
+			if (distanceToTarget < 4.f) {
+				mMoveToCenter = false;
+			}
+		}
+		else {
+			// 如果速度小于最大速度，则加速
+			if (mSpeed < mMaxSpeed)
+				mSpeed += mAcc * static_cast<float>(delta);
+			// 否则匀速移动
+			else mSpeed = mMaxSpeed;
+			mSprite->move({ 0,-mSpeed * static_cast<float>(delta) });
+		}
 	}
 }
 

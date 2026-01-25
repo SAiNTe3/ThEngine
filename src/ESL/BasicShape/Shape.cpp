@@ -59,6 +59,11 @@ namespace esl
 		this->m_rotation = angle;
 	}
 
+	void Shape::setAsInversionLayer(bool invert)
+	{
+		this->m_InversionLayer = invert;
+	}
+
 	glm::vec4 Shape::getColor() const
 	{
 		return this->m_color;

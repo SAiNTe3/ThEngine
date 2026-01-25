@@ -327,7 +327,7 @@ public:
 class DistanceTraveledStop : public IStopCondition {
 private:
     float mTargetDistance;
-    glm::vec2 mStartPosition;
+    glm::vec2 mStartPosition{0,0};
     bool mInitialized = false;
 
 public:

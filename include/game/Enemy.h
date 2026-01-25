@@ -9,6 +9,7 @@
 #include <functional>
 #include "ActionFactory.h"
 #include "MovementBuilder.h"
+#include <Animation.h>
 #ifndef PRINT_INFO
 #define PRINT_INFO printf
 #endif
@@ -48,14 +49,16 @@ protected:
 		int radius = 0;
 	}mBonusNum;
 	static pTexture sHPBar;
-	static ScriptSystem* sScriptSystem;
-	virtual void DeathSoundEffect();
+	
+	
 	int mEnemyHP = 0;
 	bool isHitByPlayer = false;
 	double hitAnimationTimer = 0.0;
 
-	
+	static ScriptSystem* sScriptSystem;
 public:	
+	
+	virtual void DeathSoundEffect();
 	enum class EnemyType {
 		NORMAL, BOSS, EMITTER
 	}mEnemyType = EnemyType::NORMAL;
@@ -184,9 +187,13 @@ class Boss : public Enemy
 		None,Move,SpellCard
 	}mStatus = BossStatus::None;
 	long double totalTime = 0;
+
+	DeathCircle mDeathCircle;
+
 protected:
-	void DeathSoundEffect() override;
+	
 public:
+	void DeathSoundEffect() override;
 	Boss(size_t boss, int hp,glm::vec2 pos);
 	virtual void update(double deltaTime)override;
 	virtual void render()override;

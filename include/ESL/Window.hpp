@@ -40,10 +40,10 @@ namespace esl
         void hideWindow();
         void setBackgroundColor(glm::vec4 rgba_float);
         void setBackgroundColor(glm::uvec4 rgba_int);
-        void setWindowSize(glm::vec2 size);
+        void setWindowSize(glm::ivec2 size);
         glm::ivec2 getWindowSize();
         glm::dvec2 getCursorPosition();
-        void setWindowPosition(glm::vec2 pos);
+        void setWindowPosition(glm::ivec2 pos);
         glm::vec2 getWindowPosition();
         void closeWindow();
         void setWindowTitle(const char* title);

@@ -99,18 +99,22 @@ namespace esl
 		m_shapeShader->setMat4("projection", projection);
 		m_shapeShader->setMat4("model", model);
 		m_shapeShader->setVec4("color", m_color);
-
+		if(m_InversionLayer)
+			glBlendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ZERO, GL_ZERO, GL_ONE);
 		if (m_isShapeFilled) {
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, m_vertices.size());
+			glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<GLsizei>(m_vertices.size()));
 		}
 		else {
 			glBindVertexArray(m_borderVAO);
 			glLineWidth(m_borderWidth);
-			glDrawArrays(GL_LINE_LOOP, 0, m_pointCount);
+			glDrawArrays(GL_LINE_LOOP, 0, static_cast<GLsizei>(m_pointCount));
 		}
 
 		glBindVertexArray(0);
+
+		if(m_InversionLayer)
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_shapeShader->unload();
 	}
 

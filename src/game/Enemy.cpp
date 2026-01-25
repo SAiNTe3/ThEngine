@@ -187,7 +187,6 @@ void Enemy::addAction(pAction action, ActionType type)
 		break;
 	case ActionType::SPAWN:
 		mSpawnAction = std::move(action);
-		
 		break;
 	}
 }
@@ -241,10 +240,10 @@ void Enemy::clearBullets()
 void EnemyUnit::texture_init()
 {
 	if (!sAnimalTexture) {
-		sAnimalTexture = std::make_unique<esl::Texture>(enemy_texture_path + "animal_spirits.png");
+		sAnimalTexture = std::make_unique<esl::Texture>(enemy_texture_path + "animal_spirits.png",esl::Texture::Wrap::CLAMP_TO_EDGE,esl::Texture::Filter::NEAREST);
 	}
 	if (!sNormalTexture) {
-		sNormalTexture = std::make_unique<esl::Texture>(enemy_texture_path + "enemy.png");
+		sNormalTexture = std::make_unique<esl::Texture>(enemy_texture_path + "enemy.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	}
 
 }
@@ -423,8 +422,8 @@ void EnemyUnit::render()
 
 void Boss::initBossLifeBar()
 {
-	hp_back_texture = std::make_unique<esl::Texture>("Assets/front/e_life_bar_1.png");
-	hp_fore_texture = std::make_unique<esl::Texture>("Assets/front/e_life_bar_2.png");
+	hp_back_texture = std::make_unique<esl::Texture>("Assets/front/e_life_bar_1.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
+	hp_fore_texture = std::make_unique<esl::Texture>("Assets/front/e_life_bar_2.png", esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	hp_fore = std::make_unique<esl::ProgressSprite>(hp_fore_texture.get());
 	hp_back = std::make_unique<esl::ProgressSprite>(hp_back_texture.get());
 	hp_fore->setPosition(glm::vec2(400, 300));
@@ -447,7 +446,7 @@ void Boss::initBoss(size_t boss,int hp,glm::vec2 pos)
 	std::string texture_path = "Assets/stgenm/stage0"+ std::to_string(boss);
 	texture_path += "/enm" + std::to_string(boss);
 	texture_path += ".png";
-	texture = std::make_unique<esl::Texture>(texture_path);
+	texture = std::make_unique<esl::Texture>(texture_path, esl::Texture::Wrap::CLAMP_TO_EDGE, esl::Texture::Filter::NEAREST);
 	mSprite = std::make_unique<esl::Sprite>(texture.get());
 	mSprite->setPosition(pos);
 	mSprite->setScale({ 2,2 });
@@ -465,7 +464,7 @@ void Boss::initBoss(size_t boss,int hp,glm::vec2 pos)
 
 void Boss::DeathSoundEffect()
 {
-	sScriptSystem->playSoundEffect("se_enep01.wav");
+	sScriptSystem->playSoundEffect("se_cat00.wav");
 }
 
 Boss::Boss(size_t boss, int hp,glm::vec2 pos)
@@ -505,12 +504,13 @@ void Boss::update(double deltaTime)
 	rotation += 0.5;
 	magic_square->setRotation(rotation);
 	magic_square->setPosition(boss_position);
-	float scaleX = 1.5 + 0.2 * sin(deltaTime);
-	float scaleY = 1.5 + 0.2 * sin(deltaTime);
+	double scaleX = 1.5 + 0.2 * sin(deltaTime);
+	double scaleY = 1.5 + 0.2 * sin(deltaTime);
 	magic_square->setScale(glm::vec2{scaleX,scaleY });
 	hp_fore->setPosition(boss_position);
 	hp_back->setPosition(boss_position);
 	hp_fore->setPercentage(float(mEnemyHP) / float(mMaxHP));
+
 }
 
 void Boss::render()

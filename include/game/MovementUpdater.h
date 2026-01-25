@@ -97,9 +97,9 @@ public:
 class TargetMovementUpdater : public IMovementUpdater {
 private:
     std::function<float(float)> mEaseFunc; // 缓动函数 t ∈ [0,1] -> [0,1]
-    glm::vec2 mStartPos;
-    float mTotalDistance;
-    float mCalculatedDuration;  // 记录计算出的持续时间
+    glm::vec2 mStartPos{0,0};
+    float mTotalDistance = 0;
+    float mCalculatedDuration = 0;  // 记录计算出的持续时间
 public:
     explicit TargetMovementUpdater(std::function<float(float)> easeFunc = nullptr)
         : mEaseFunc(easeFunc ? easeFunc : [](float t) { return t; })
@@ -342,8 +342,8 @@ class WaveMovementUpdater : public IMovementUpdater {
 private:
     float mAmplitude;      // 波动幅度
     float mFrequency;      // 波动频率
-    glm::vec2 mBaseDir;    // 基础移动方向（单位向量）
-    glm::vec2 mWaveDir;    // 波动方向（垂直于基础方向）
+    glm::vec2 mBaseDir{0,0};    // 基础移动方向（单位向量）
+    glm::vec2 mWaveDir{0,0};    // 波动方向（垂直于基础方向）
     float mBaseSpeed;      // 基础速度
     float mPhase;          // 相位偏移
 
@@ -590,7 +590,7 @@ class CompositeGeneralBezierMovementUpdater : public IMovementUpdater {
 public:
     struct BezierSegment {
         std::vector<glm::vec2> controlPoints;
-        float duration;
+        float duration = 0;
         std::function<float(float)> easeFunc;
     };
 

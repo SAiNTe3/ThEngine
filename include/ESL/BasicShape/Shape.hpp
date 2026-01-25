@@ -12,8 +12,10 @@ namespace esl
 		glm::vec2 m_scale = { 1.f,1.f };
 		bool m_isShapeFilled = true;
 		float m_borderWidth = 2.f;
-		GLuint VAO, VBO, EBO;
-		Shader* m_shapeShader;
+		GLuint VAO = 0, VBO = 0, EBO = 0;
+		Shader* m_shapeShader = nullptr;
+		// 用于颜色反转的标志
+		bool m_InversionLayer = false;
 	public:
 		Shape();
 		~Shape();
@@ -22,7 +24,7 @@ namespace esl
 		void setPosition(glm::vec2 pos);
 		void setScale(glm::vec2 scale);
 		void setRotation(float angle);
-
+		void setAsInversionLayer(bool invert);
 		glm::vec4 getColor()const;
 		bool isFilled()const;
 		glm::vec2 getPosition()const;

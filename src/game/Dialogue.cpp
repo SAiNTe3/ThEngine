@@ -135,8 +135,8 @@ void Dialogue::update(double deltaTime)
 		player_visible = true;
 		player.face_index = info.face;
 		player.full_sprite->setColor(glm::vec4(1, 1, 1, 1));
-		player.moveToDir(deltaTime);
-		boss.moveToOri(deltaTime);
+		player.moveToDir(static_cast<float>(deltaTime));
+		boss.moveToOri(static_cast<float>(deltaTime));
 		if (player.face_index != -1) {
 			glm::vec2 pos = player.full_sprite->getPosition();
 			player.face_sprites[player.face_index]->setPosition(pos+player.face_pos*glm::vec2(0.7,0.7));
@@ -152,8 +152,8 @@ void Dialogue::update(double deltaTime)
 		boss_visible = true;
 		boss.face_index = info.face;
 		boss.full_sprite->setColor(glm::vec4(1, 1, 1, 1));
-		boss.moveToDir(deltaTime);
-		player.moveToOri(deltaTime);
+		boss.moveToDir(static_cast<float>(deltaTime));
+		player.moveToOri(static_cast<float>(deltaTime));
 		if (boss.face_index != -1) {
 			glm::vec2 pos = boss.full_sprite->getPosition();
 			boss.face_sprites[boss.face_index]->setPosition(pos + boss.face_pos * glm::vec2(0.7, 0.7));
