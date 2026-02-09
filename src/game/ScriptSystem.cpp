@@ -478,7 +478,8 @@ bool ScriptSystem::preloadSoundEffect(const std::string& dirPath)
 					// “Ù–ßº”‘ÿ¬ﬂº≠
 					mSoundEffects[fileName] = std::move(std::make_unique<esl::Audio>(filePath,*pAudioEngine));
 
-					std::cout << "Loaded sound effect: " << fileName << std::endl;
+					mSoundEffects[fileName]->setVolume(0.5f);
+					//std::cout << "Loaded sound effect: " << fileName << std::endl;
 				}
 			}
 		}

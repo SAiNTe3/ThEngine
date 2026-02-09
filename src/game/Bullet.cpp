@@ -168,10 +168,9 @@ Bullet_1::Bullet_1(int type, int color, glm::vec2 pos, esl::Window& render, floa
 	static bool firstTime = true;
 	if (firstTime) {
 		firstTime = false;
-		printf("[Bullet_1] Object size: %zu bytes\n", sizeof(Bullet_1));
-		printf("[Bullet_1] Sprite size: %zu bytes\n", sizeof(esl::Sprite));
-		printf("[Bullet_1] Expected 5000 bullets memory: %.2f MB\n",
-			sizeof(Bullet_1) * 5000 / 1024.0 / 1024.0);
+		//printf("[Bullet_1] Object size: %zu bytes\n", sizeof(Bullet_1));
+		//printf("[Bullet_1] Sprite size: %zu bytes\n", sizeof(esl::Sprite));
+		//printf("[Bullet_1] Expected 5000 bullets memory: %.2f MB\n",sizeof(Bullet_1) * 5000 / 1024.0 / 1024.0);
 	}
 	// 创建精灵（使用临时纹理，会在 setupBulletProperties 中正确设置）
 	mSprite = std::make_unique<esl::Sprite>(sTexture[0].get());

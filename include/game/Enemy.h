@@ -80,6 +80,7 @@ public:
 	float mAngle = 0;
 	bool mSpriteAvailable = true;
 	bool mBulletsAvailable = true;
+	bool mSpwaned = false;
 	bool mFinished = false;
 	bool mHitable = true;
 	// 是否在敌人死亡后清除其弹幕

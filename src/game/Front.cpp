@@ -105,6 +105,7 @@ Front::Front(esl::Window& window) : renderer(window)
 	
 	mBossXPosIndicator = std::make_unique<esl::Sprite>(mTexture.get());
 	mBossXPosIndicator->setTextureRect({ 928,0 }, { 96,32 });
+	
 	char_map_init();
 }
 void Front::bindData(unsigned int& score, unsigned int& highscore, unsigned int& life, unsigned int& spellcard, unsigned int& power, unsigned int& money)
@@ -118,10 +119,7 @@ void Front::bindData(unsigned int& score, unsigned int& highscore, unsigned int&
 }
 Front::~Front()
 {
-	delete[] mHighScoreText;
-	delete[] mScoreText;
-	delete[] mPowerText;
-	delete[] mMoneyText;
+	
 }
 void Front::char_map_init()
 {
@@ -236,37 +234,36 @@ void Front::char_map_init()
 		mCharMap[i].bindCharacter(U'.', { 32 * 14,y }, { 15,39 });
 		mCharMap[i].bindCharacter(U'/', { 32 * 15,y }, { 26,39 });
 	}
-	
 	for (int i = 0; i < 2; i++) {
-		mHighScoreText[i] = new esl::Text(U"1,000,000");
+		mHighScoreText[i] = std::make_unique<esl::Text>(U"1,000,000");
 		mHighScoreText[i]->bindMap(mCharMap[i]);
 		mHighScoreText[i]->setCharacterSpace(20);
 		mHighScoreText[i]->setPosition(mHighScore->getPosition() + glm::vec2{ 324,0 });
 		mHighScoreText[i]->setScale(glm::vec2{ 1 + i * 0.1,1 + i * 0.1 });
 		mHighScoreText[i]->setHorizontalAlign(esl::Text::HorizontalAlign::Right);
-
-		mScoreText[i] = new esl::Text(U"0");
+		mScoreText[i] = std::make_unique<esl::Text>(U"0");
 		mScoreText[i]->bindMap(mCharMap[i]);
 		mScoreText[i]->setPosition(mScore->getPosition() + glm::vec2{ 324,0 });
 		mScoreText[i]->setCharacterSpace(20);
 		mScoreText[i]->setScale(glm::vec2{ 1 + i * 0.1,1 + i * 0.1 });
 		mScoreText[i]->setHorizontalAlign(esl::Text::HorizontalAlign::Right);
-
+		
 		glm::vec2 pos = { mScore->getPosition().x,mPower->getPosition().y };
-		mPowerText[i] = new esl::Text(U"1.00/4.00");
+		mPowerText[i] = std::make_unique<esl::Text>(U"1.00/4.00");
 		mPowerText[i]->bindMap(mCharMap[i]);
 		mPowerText[i]->setPosition(pos + glm::vec2{ 324,0 });
 		mPowerText[i]->setCharacterSpace(20);
 		mPowerText[i]->setScale(glm::vec2{ 1 + i * 0.1,1 + i * 0.1 });
 		mPowerText[i]->setHorizontalAlign(esl::Text::HorizontalAlign::Right);
 		pos.y = mMoney->getPosition().y;
-		mMoneyText[i] = new esl::Text(U"0");
+		mMoneyText[i] = std::make_unique<esl::Text>(U"0");
 		mMoneyText[i]->bindMap(mCharMap[i]);
 		mMoneyText[i]->setCharacterSpace(20);
 		mMoneyText[i]->setPosition(pos + glm::vec2{ 324,0 });
 		mMoneyText[i]->setScale(glm::vec2{ 1 + i * 0.1,1 + i * 0.1 });
 		mMoneyText[i]->setHorizontalAlign(esl::Text::HorizontalAlign::Right);
 	}
+	
 	mHighScoreText[0]->setColor(glm::uvec4{ 112,112,112,255 });
 	mScoreText[0]->setColor(glm::uvec4{ 6,22,131,255 });
 	mPowerText[0]->setColor(glm::uvec4{ 133,9,9,255 });
@@ -327,11 +324,16 @@ void Front::render()
 	}
 	if(mDifficultyIcons)
 		renderer.draw(*mDifficultyIcons);
-	if(mItemGetBorderLine)
-		renderer.draw(*mItemGetBorderLine);
-	if(mItemGetBorderText)
-		renderer.draw(*mItemGetBorderText);
+
 	
+}
+
+void Front::renderRemaining()
+{
+	if (mItemGetBorderLine)
+		renderer.draw(*mItemGetBorderLine);
+	if (mItemGetBorderText)
+		renderer.draw(*mItemGetBorderText);
 }
 
 void Front::update(double delta)

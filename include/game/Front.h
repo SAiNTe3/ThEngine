@@ -13,6 +13,7 @@ class Front {
 	const float BOTTOM = 32.0f;
 	using pSprite = std::unique_ptr<esl::Sprite>;
 	using pTexture = std::unique_ptr<esl::Texture>;
+	using pText = std::unique_ptr<esl::Text>;
 	struct Data {
 		unsigned int* score;
 		unsigned int* highscore;
@@ -50,7 +51,10 @@ class Front {
 
 	esl::CharacterMap mCharMap[2];
 	esl::CharacterMap mCharMapF;
-	esl::Text* mHighScoreText[2], * mScoreText[2], * mPowerText[2], * mMoneyText[2];
+	pText mHighScoreText[2];
+	pText mScoreText[2];
+	pText mPowerText[2];
+	pText mMoneyText[2];
 	void char_map_init();
 	void text_update();
 public:
@@ -64,5 +68,6 @@ public:
 	void bindData(unsigned int& score, unsigned int& highscore, unsigned int& life, unsigned int& spellcard, unsigned int& power, unsigned int& money);
 	~Front();
 	void render();
+	void renderRemaining();
 	void update(double delta);
 };

@@ -80,13 +80,13 @@ void BulletPool::preallocate(size_t count, esl::Window& render) {
         printf("[BulletPool] Auto-expanded maxPoolSize to %zu\n", m_maxPoolSize);
     }
 
-    printf("[BulletPool] Preallocating %zu bullets...\n", count);
+    //printf("[BulletPool] Preallocating %zu bullets...\n", count);
 
     for (size_t i = 0; i < count; ++i) {
         auto bullet = std::make_unique<Bullet_1>(1, 0, glm::vec2(-1000, -1000), render, 0.0f, 0.0f);
         m_availableBullets.push(std::move(bullet));
     }
-    printf("[BulletPool] Preallocated %zu bullets successfully!\n", m_availableBullets.size());
+    //printf("[BulletPool] Preallocated %zu bullets successfully!\n", m_availableBullets.size());
 }
 
 size_t BulletPool::getAvailableCount() const {

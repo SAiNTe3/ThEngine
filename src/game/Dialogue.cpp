@@ -12,7 +12,7 @@ void Dialogue_Illustration::init(const std::string& path,const std::string& inde
 	glm::vec2 size = glm::vec2(full_illustration->getSize().w, full_illustration->getSize().h);
 	const glm::vec2 normal_size = glm::vec2(378, 728) * cutScale;
 	glm::vec2 scale = normal_size / size;
-	printf("CutScale: %.2f\n", cutScale);
+	// printf("CutScale: %.2f\n", cutScale);
 	full_sprite->setScale(reverse ? glm::vec2{ -scale.x,scale.y } : scale);
 
 	ori_pos = reverse ? 

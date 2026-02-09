@@ -39,7 +39,7 @@ void Enemy::update(double delta)
 		if (firstApply) {
 			firstApply = false;
 			sScriptSystem->playSoundEffect("se_ch02.wav");
-			
+			mSpwaned = true;
 		}
 		mSpawnAction->apply(this);
 		if (mSpawnAction->update(delta)) {
@@ -515,9 +515,12 @@ void Boss::update(double deltaTime)
 
 void Boss::render()
 {
-	mRenderer->draw(*magic_square.get());
-	mRenderer->draw(*hp_back.get());
-	mRenderer->draw(*hp_fore.get());
+	if (mSprite && mSpriteAvailable && mSpwaned) {
+		mRenderer->draw(*magic_square.get());
+		mRenderer->draw(*hp_back.get());
+		mRenderer->draw(*hp_fore.get());
+	}
+
 	Enemy::render();
 }
 

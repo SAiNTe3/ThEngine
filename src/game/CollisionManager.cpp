@@ -31,9 +31,6 @@ bool CollisionManager::checkEnemyBulletsVsPlayer(
     float playerRadius = player.mMissRadius;
     float grazeRadius = playerRadius + 64.0f;
 
-    // 预计算，避免循环内重复计算
-    float playerRadiusSq = playerRadius * playerRadius;
-    float grazeRadiusSq = grazeRadius * grazeRadius;
 
     for (const auto& bullet : bullets) {
         if (!bullet || !bullet->getSprite()) continue;
@@ -46,7 +43,7 @@ bool CollisionManager::checkEnemyBulletsVsPlayer(
         float dy = playerPos.y - bulletPos.y;
 
         // 使用保守估计的边界框
-        float maxDist = playerRadius + bulletRadius + 10.0f;
+        float maxDist = playerRadius + bulletRadius + 64.0f;
         if (dx > maxDist || dx < -maxDist) continue;
         if (dy > maxDist || dy < -maxDist) continue;
 
@@ -60,15 +57,14 @@ bool CollisionManager::checkEnemyBulletsVsPlayer(
 
         // 擦弹检测
         if (bullet->lastGrazeTime > 0.5f) {
-            // 优化：擦弹也使用 AABB 剔除
-            float grazeDist = grazeRadius + bulletRadius + 10.0f;
-            if (dx > grazeDist || dx < -grazeDist) continue;
-            if (dy > grazeDist || dy < -grazeDist) continue;
+            float grazeDist = grazeRadius + bulletRadius;
 
-            if (circleCollision(playerPos, grazeRadius, bulletPos, bulletRadius)) {
-                bullet->lastGrazeTime = 0;
-                if (mPlayerGrazeEnemyBulletCallback) {
-                    mPlayerGrazeEnemyBulletCallback();
+            if (std::abs(dx) <= grazeDist && std::abs(dy) <= grazeDist) {
+                if (circleCollision(playerPos, grazeRadius, bulletPos, bulletRadius)) {
+                    bullet->lastGrazeTime = 0.f;
+
+                    if (mPlayerGrazeEnemyBulletCallback)
+                        mPlayerGrazeEnemyBulletCallback();
                 }
             }
         }
@@ -131,7 +127,7 @@ bool CollisionManager::checkPlayerBulletsVsEnemy(
         // 使用 rectCollision 统一处理
         if (rectCollision(bulletPos, bulletSize, enemyPos, enemySize) && enemy.getHP() > 0) {
             enemy.onBulletHit(10);
-            it = bullets.erase(it);
+			(*it)->setAvailable(false);
             if (mPlayerBulletHitEnemyCallback) {
                 mPlayerBulletHitEnemyCallback();
             }

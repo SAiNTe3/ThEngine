@@ -30,6 +30,10 @@ public:
 	virtual void process_input(esl::Event& e);
 	virtual void render();
 	virtual void update(double deltaTime);
+	void switchToScene(int index) {
+		mSceneInfo.mSwitchToNextScene = true;
+		mSceneInfo.mSwitchToSceneIndex = index;
+	}
 };
 
 // 游戏主界面
@@ -63,7 +67,7 @@ class MainGame :public Scene {
 	const float TOP = 896 + 32;
 	const float BOTTOM = 32.0f;
 	esl::Window& mRenderer;
-	Player* mPlayer;
+	std::unique_ptr<Player> mPlayer;
 	double mDeltaTime = 0;
 	std::vector<Enemy*> mEnemys;
 	CollisionManager mCollisionManager;  // 添加碰撞管理器
@@ -74,12 +78,15 @@ class MainGame :public Scene {
 	glm::vec2 mCenterPos { 768.0f / 2 + 64 ,128 };
 	bool mPause = false;
 	std::vector<Bullet*> mAllEnemyBullets;
-
+	
 	// DeathCircle
 	DeathCircle mDeathCircle;
 	PauseMenu mPauseMenu;
 	esl::BlurEffect mBlurEffect;
 	bool mBlurredScreenReady = false;
+
+	SwitchScreenAnimation mSwitchScreenAnimation;
+	bool mSwitchEffectEnabled = false;
 public:
 	MainGame(esl::Window& render, ScriptSystem& system);
 	virtual void process_input(esl::Event& e);
@@ -88,6 +95,15 @@ public:
 	void data_maintain();
 	void pause();
 	void resume();
+	void handleGlobalInput(esl::Event& e);
+	void enterPause();
+	void returnTitleScreen();
+	void requestExitPause();
+	void handlePauseInput(esl::Event& e);
+	void handleGameplayInput(esl::Event& e);
+	void stopPlayerInput();
+	void handlePlayerMovement(esl::Event& e);
+	void handlePlayerShooting(esl::Event& e);
 	std::vector<Enemy*>& getEnemys() { return this->mEnemys; }
 	void setupStage();
 	glm::vec2 Position(glm::vec2 pos = {0,0}) {

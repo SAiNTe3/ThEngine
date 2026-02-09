@@ -44,7 +44,6 @@ public:
 	void textLine2(const std::wstring& text);// 设置第二行文本
 	void addText(const std::wstring& text);// 设置下一行文本
 	void setBalloonStyle(int style);
-	void setBalloonLength(float length);
 	void setFont(esl::Font& font);
 	void clearText();// 清除文本
 	void endEdit();

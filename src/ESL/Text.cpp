@@ -93,7 +93,7 @@ namespace esl
 	{
 		this->m_Content = text;
 		m_SpriteVector.clear();
-		std::cout << "Text::Text Warning: No charMap bind!" << std::endl;
+		//std::cout << "Text::Text Warning: No charMap bind!" << std::endl;
 	}
 
 	void Text::setText(const std::u32string& text)

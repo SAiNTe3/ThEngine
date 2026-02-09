@@ -11,6 +11,7 @@ file(COPY ${RESOURCE} DESTINATION ${CMAKE_BINARY_DIR})
 
 file(GLOB SRC_FILES "src/ESL/*.cpp" "src/ESL/BasicShape/*.cpp" "src/ESL/Widget/*.cpp" "src/game/*.cpp")
 
+
 include_directories(
     SYSTEM ${CMAKE_SOURCE_DIR}/include
     SYSTEM ${CMAKE_SOURCE_DIR}/include/ESL

@@ -6,7 +6,9 @@
 #include <random>
 #include <ScriptSystem.h>
 #include <Animation.h>
-
+#include <vector>
+#include <memory>
+#include <functional>
 
 using pSprite = std::unique_ptr<esl::Sprite>;
 using pTexture = std::unique_ptr<esl::Texture>;
@@ -33,8 +35,9 @@ struct TraceBullet {
 
 
 class Player {
-
+	
 protected:
+
 	static ScriptSystem* mScriptSystem;
 	size_t mFrame = 0;
 	pSprite mSprite;
@@ -70,7 +73,7 @@ public:
 	bool mEnableShoot = false;
 	bool mHyperMode = true;
 	float mMissRadius = 3;
-	Player(unsigned int& power): mPower(power) {}
+	Player(unsigned int& power) :mPower(power) {}
 	void set_position(glm::vec2 pos);
 	glm::vec2 get_position();
 	void move(glm::vec2 distance);

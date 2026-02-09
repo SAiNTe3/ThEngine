@@ -51,14 +51,12 @@ class Dialogue
 	double mExitTimer = 0.0;
 public:
 	void init(esl::Window& renderer);
-	void test_init();
 	void hide_player() { player_visible = false; }
 	void hide_boss() { boss_visible = false; }
 	void show_player() { player_visible = true; }
 	void show_boss() { boss_visible = true; }
 	void render();
 	void update(double deltaTime);
-	void loadDialogue(const std::string& path);
 	void process_input(esl::Event& e);
 	void reset();
 	void startExit();

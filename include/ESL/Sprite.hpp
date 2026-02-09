@@ -34,6 +34,7 @@ namespace esl
 		//给ProgressSprite提供接口
 		void bindTexture(){ m_Texture->bind(); }
 		bool m_available = true;
+		
 	public:
 		Sprite();
 		Sprite(Texture* texture);

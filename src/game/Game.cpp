@@ -72,6 +72,7 @@ void Game::update()
 				default:
 					break;
 				}
+				
 			}
 		}
 		
