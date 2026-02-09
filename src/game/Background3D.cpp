@@ -9,6 +9,12 @@ void Background3D::init(esl::Window* renderer, glm::vec2 pos)
 	mCenterPos = pos;
 }
 
+void Background3D::cleanup()
+{
+	mRenderer = nullptr;
+	mCenterPos = { 0, 0 };
+}
+
 Background3D::Background3D()
 {
 }

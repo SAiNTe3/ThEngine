@@ -36,10 +36,11 @@ protected:
 	static const glm::vec2 etbreakFrames[8];
 
 public:
-	static void createEtBreakEffect(glm::vec2 pos);
-	static void updateEtBreaks(double deltaTime);
-	static void drawEtBreaks(esl::Window& renderer);
-	static void initEtBreak();
+static void createEtBreakEffect(glm::vec2 pos);
+static void updateEtBreaks(double deltaTime);
+static void drawEtBreaks(esl::Window& renderer);
+static void initEtBreak();
+static void cleanupEtBreak();
 
 	double mCollisionRadius = 10;
 	std::deque<pBulletMovementAction> mMovementActions; // Changed type
@@ -62,6 +63,7 @@ class Bullet_1 : public Bullet {
 
 public:
 	static void init();
+	static void cleanup();
 	float mAngle = 0;
 	float mSpeed = 0;
 	bool mSyncRotation = false;

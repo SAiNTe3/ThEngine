@@ -102,8 +102,8 @@ MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mR
 	Player::setSystem(&mScriptSystem);
 
 	// 步骤2：预分配对象池
-	BulletPoolHelper::preallocateBullets(2500, render);
-	mAllEnemyBullets.reserve(2500);
+	BulletPoolHelper::preallocateBullets(3000, render);
+	mAllEnemyBullets.reserve(3000);
 
 	// 步骤3：创建 Player 实例
 	mPlayer = std::make_unique<Reimu>(mRenderer, mData.mPlayerPower);
@@ -157,6 +157,48 @@ MainGame::MainGame(esl::Window& render, ScriptSystem& system) :Scene(system), mR
 	setupStage();
 
 	
+}
+
+MainGame::~MainGame()
+{
+	// 1. 清理所有敌人对象（包括其持有的子弹）
+	for (auto* enemy : mEnemys) {
+		if (enemy) {
+			delete enemy;  // Enemy析构函数会清理其mBullets
+		}
+	}
+	mEnemys.clear();
+	mAllEnemyBullets.clear();  // 清空指针向量（实际对象已被Enemy析构）
+
+	// 2. 清理原生指针对象
+	if (mFront) {
+		delete mFront;
+		mFront = nullptr;
+	}
+	if (mBackground) {
+		delete mBackground;
+		mBackground = nullptr;
+	}
+
+	// 3. 清理对象池（释放所有预分配的子弹对象）
+	BulletPool::getInstance().clear();
+	
+	// 4. 清理静态道具资源（道具对象、纹理等）
+	Item::cleanup();
+	
+	// 5. 清理子弹静态资源（纹理等）
+	Bullet_1::cleanup();
+	
+	// 6. 清理子弹特效资源
+	Bullet::cleanupEtBreak();
+	
+	// 7. 清理敌人静态资源（HP条纹理等）
+	Enemy::cleanup();
+	
+	// 8. 清理背景静态资源
+	Background3D::cleanup();
+
+
 }
 
 void MainGame::process_input(esl::Event& e)

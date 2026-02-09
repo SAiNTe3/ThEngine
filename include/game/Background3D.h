@@ -16,8 +16,9 @@ protected:
 	pTexture mBaseTexture = nullptr;
 	int mPhase = 0;
 public:
-	static void init(esl::Window* renderer, glm::vec2 center);
-	Background3D();
+static void init(esl::Window* renderer, glm::vec2 center);
+static void cleanup();
+Background3D();
 	virtual void update(double deltaTime);
 	virtual void render() = 0;
 	void nextPhase() {

@@ -49,4 +49,5 @@ public:
 	static void RenderAll();
 	static void UpdateAll(double delta, float playerPosY);
 	static void SetCollectLine(float y);
+	static void cleanup();
 };

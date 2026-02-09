@@ -307,6 +307,21 @@ void Bullet::initEtBreak()
 	etbreakSprite = std::make_unique<esl::Sprite>(etbreakTexture.get());
 }
 
+void Bullet::cleanupEtBreak()
+{
+	etbreaks.clear();
+	etbreakSprite.reset();
+	etbreakTexture.reset();
+}
+
+void Bullet_1::cleanup()
+{
+	// 释放所有静态纹理
+	for (int i = 0; i < 6; i++) {
+		sTexture[i].reset();
+	}
+}
+
 void Bullet_1::addMovementAction(pBulletMovementAction action)
 {
 	mMovementActions.push_back(std::move(action));

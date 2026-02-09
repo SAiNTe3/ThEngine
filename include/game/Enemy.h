@@ -65,6 +65,7 @@ public:
 	std::vector<pBullet> mBullets;  // Enemy 发射的子弹列表
 	double mCollisionRadius = 10;
 	static void init(esl::Window* renderer);
+	static void cleanup();
 	static void setSystem(ScriptSystem* system) {
 		sScriptSystem = system;
 	}
@@ -138,6 +139,8 @@ class EnemyUnit : public Enemy {
 private:
 	static pTexture sAnimalTexture;
 	static pTexture sNormalTexture;
+	
+	friend class Enemy;  // 允许 Enemy::cleanup 访问私有静态成员
 
 	std::vector<glm::vec2> mRect;
 	glm::vec2 mSize;

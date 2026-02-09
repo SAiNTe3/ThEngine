@@ -14,7 +14,9 @@ BulletPool::BulletPool(size_t initialSize, size_t maxSize)
 BulletPool& BulletPool::getInstance() {
     std::lock_guard<std::mutex> lock(s_mutex);
     if (!s_instance) {
-        s_instance = std::unique_ptr<BulletPool>(new BulletPool(2500,2500));
+        // 初始容量: 3000, 最大容量: 5000
+        // 这样可以减少对象池耗尽的情况
+        s_instance = std::unique_ptr<BulletPool>(new BulletPool(3000, 5000));
     }
     return *s_instance;
 }
@@ -62,7 +64,19 @@ void BulletPool::returnBullet(std::unique_ptr<Bullet_1> bullet) {
     
     std::lock_guard<std::mutex> lock(m_poolMutex);
 
-    // 修复：移除 maxPoolSize 限制
+    // 修复：限制对象池大小，防止无限增长
+    // 如果对象池已满（超过最大容量），直接丢弃子弹（让它自动析构）
+    if (m_availableBullets.size() >= m_maxPoolSize) {
+        static size_t discardCount = 0;
+        if (++discardCount % 1000 == 0) {
+            printf("[BulletPool Warning] Pool is full (%zu/%zu), discarded %zu bullets\n",
+                m_availableBullets.size(), m_maxPoolSize, discardCount);
+        }
+        // bullet 会在这里自动析构
+        return;
+    }
+
+    // 重置子弹状态
     bullet->mMovementActions.clear();
     bullet->mAngle = 0.0f;
     bullet->mSpeed = 0.0f;
@@ -99,6 +113,11 @@ void BulletPool::clear() {
     while (!m_availableBullets.empty()) {
         m_availableBullets.pop();
     }
+}
+
+BulletPool::~BulletPool()
+{
+    clear();
 }
 
 // BulletPoolHelper 命名空间的实现

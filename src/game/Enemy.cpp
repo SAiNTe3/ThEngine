@@ -17,6 +17,18 @@ void Enemy::init(esl::Window* renderer)
 	mRenderer = renderer;
 }
 
+void Enemy::cleanup()
+{
+	// ÷ÿ÷√æ≤Ã¨Œ∆¿Ì
+	sHPBar.reset();
+	EnemyUnit::sAnimalTexture.reset();
+	EnemyUnit::sNormalTexture.reset();
+	
+	// ÷ÿ÷√æ≤Ã¨÷∏’Î
+	mRenderer = nullptr;
+	sScriptSystem = nullptr;
+}
+
 void Enemy::updateActionQueue(std::deque<pAction>& actions, double delta)
 {
 	if (!actions.empty()) {

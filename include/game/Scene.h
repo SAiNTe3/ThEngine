@@ -27,6 +27,7 @@ public:
 		int mSwitchToSceneIndex = -1;
 	}mSceneInfo;
 	Scene(ScriptSystem& scriptSystem):mScriptSystem(scriptSystem){}
+	virtual ~Scene() = default;  // Ìí¼ÓÐéÎö¹¹º¯Êý
 	virtual void process_input(esl::Event& e);
 	virtual void render();
 	virtual void update(double deltaTime);
@@ -88,11 +89,12 @@ class MainGame :public Scene {
 	SwitchScreenAnimation mSwitchScreenAnimation;
 	bool mSwitchEffectEnabled = false;
 public:
-	MainGame(esl::Window& render, ScriptSystem& system);
-	virtual void process_input(esl::Event& e);
-	virtual void render();
-	virtual void update(double deltaTime);
-	void data_maintain();
+MainGame(esl::Window& render, ScriptSystem& system);
+~MainGame();
+virtual void process_input(esl::Event& e);
+virtual void render();
+virtual void update(double deltaTime);
+void data_maintain();
 	void pause();
 	void resume();
 	void handleGlobalInput(esl::Event& e);

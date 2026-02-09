@@ -18,7 +18,6 @@ private:
     
     // 私有构造函数，实现单例模式
     BulletPool(size_t initialSize = 100, size_t maxSize = 500);
-    
 public:
     // 获取单例实例
     static BulletPool& getInstance();
@@ -44,7 +43,7 @@ public:
     void clear();
     
     // 析构函数
-    ~BulletPool() = default;
+    ~BulletPool();
     
 private:
     // 重新初始化子弹对象

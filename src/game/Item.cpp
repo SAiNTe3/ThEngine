@@ -130,6 +130,25 @@ void Item::SetCollectLine(float y)
 	collectLineY = y;
 }
 
+void Item::cleanup()
+{
+	// 清理所有未收集的道具
+	for (auto* item : mItems) {
+		if (item) {
+			delete item;
+		}
+	}
+	mItems.clear();
+	
+	// 清理静态纹理资源
+	itemTexture.reset();
+	
+	// 重置静态指针
+	mRenderer = nullptr;
+	mPlayer = nullptr;
+	mData = nullptr;
+}
+
 void Item::update(double delta)
 {
 
